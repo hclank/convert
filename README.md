@@ -26,7 +26,7 @@ This tool requires FFmpeg to be installed on your system.
 Once you have published this to PyPI, users can install it via:
 
 ```bash
-pip install universal-converter-cli
+pip install convertr
 ```
 
 ## 🛠 Usage
