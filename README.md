@@ -31,7 +31,6 @@ pip install universal-converter-cli
 
 ````
 
----
 
 ## 🛠 Usage
 
@@ -105,7 +104,6 @@ convert --help
 
 ```
 
----
 
 ## 📜 License
 
