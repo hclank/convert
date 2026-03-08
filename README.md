@@ -1,4 +1,4 @@
-# 🎥 Universal Media Converter CLI
+# 🎥 Convertr
 
 A fast, lightweight, and dead-simple Command Line Interface (CLI) for converting any media file to another format. Powered by **Python**, **Typer**, and **FFmpeg**.
 
