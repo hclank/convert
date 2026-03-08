@@ -1,21 +1,31 @@
 import ffmpeg
-import click
+import typer
+import os
+from pathlib import Path
+from typing import Optional
+
+app = typer.Typer(
+    help="A simple CLI tool to convert video files to any format using ffmpeg."
+)
 
 
-@click.command()
-@click.option("--count", default=1, help="Number of greetings")
-@click.option("--name", prompt="Your name", help="The person to greet.")
-def hello(count, name):
-    for x in range(count):
-        click.echo(f"Hello {name}")
-
-
-@click.command()
-@click.option("--convert", help="Convert a video file to any format")
-def convert_video(input_file, output_file):
-    ffmpeg.input(input_file).output(output_file, vcodec="libx264", acodec="aac").run()
-
-
-if __name__ == "__main__":
-    hello()
-    convert_video()
+def run_ffmpeg_conversion(input_path: Path, output_path: Path):
+    try:
+        typer.echo(f"Converting {input_path} to {output_path}")
+        stream = ffmpeg.input(str(input_path))
+        stream = ffmpeg.output(
+            stream,
+            str(output_path),
+            vcodec="libx264",
+            acodec="aac",
+            strict="experimental",
+            loglevel="quiet",
+        )
+        ffmpeg.run(stream, overwrite_output=True)
+        typer.secho(
+            f"✅ Successfully converted to {output_path}", fg=typer.colors.GREEN
+        )
+    except ffmpeg.Error as e:
+        typer.secho(f"❌ FFmpeg Error: {e.stderr.decode()}", fg=typer.colors.RED)
+    except Exception as e:
+        typer.secho(f"❌ Unexpected Error: {e}", fg=typer.colors.RED)
