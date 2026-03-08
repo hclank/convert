@@ -1,0 +1,10 @@
+[project]
+name = "convertr"
+version = "0.1.0"
+dependencies = [
+    "typer[all]",
+    "ffmpeg-python",
+]
+
+[project.scripts]
+convert = "convertr.main:app"
