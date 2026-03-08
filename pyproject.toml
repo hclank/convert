@@ -1,10 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "convertr"
 version = "0.1.0"
+description = "A universal media converter CLI using FFmpeg"
+readme = "README.md"
+requires-python = ">=3.8"
 dependencies = [
     "typer[all]",
     "ffmpeg-python",
 ]
 
 [project.scripts]
-convert = "convertr.main:app"
+convert = "converter.main:app"
