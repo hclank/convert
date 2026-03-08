@@ -11,6 +11,7 @@ requires-python = ">=3.8"
 dependencies = [
     "typer[all]",
     "ffmpeg-python",
+    "pydantic>=1.10.2,<2.1.0"  # This forces the version redis-om needs
 ]
 
 [project.scripts]
