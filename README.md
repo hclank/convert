@@ -29,9 +29,6 @@ Once you have published this to PyPI, users can install it via:
 pip install universal-converter-cli
 ```
 
-````
-
-
 ## 🛠 Usage
 
 The CLI provides two main commands: `file` (for single items) and `dir` (for batch processing).
@@ -104,10 +101,6 @@ convert --help
 
 ```
 
-
 ## 📜 License
 
 Distributed under the MIT License.
-
-
-````
