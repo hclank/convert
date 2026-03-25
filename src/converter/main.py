@@ -9,26 +9,26 @@ app = typer.Typer(
 )
 
 
-def run_ffmpeg_conversion(input_path: Path, output_path: Path):
+def run_ffmpeg_conversion(input_path: Path, output_path: Path, crf: int = 23):
+    """Core logic with adjustable compression (CRF)."""
     try:
-        typer.echo(f"Converting {input_path} to {output_path}")
-        stream = ffmpeg.input(str(input_path))
-        stream = ffmpeg.output(
-            stream,
-            str(output_path),
-            vcodec="libx264",
-            acodec="aac",
-            strict="experimental",
-            loglevel="quiet",
+        typer.echo(f"⏳ Processing: {input_path.name} (CRF: {crf})...")
+
+        (
+            ffmpeg.input(str(input_path))
+            .output(
+                str(output_path),
+                vcodec="libx264",
+                acodec="aac",
+                crf=crf,  # 0-51: 18 is high qual, 28 is high comp
+                preset="medium",  # 'slower' = better compression, 'faster' = bigger file
+                loglevel="error",
+            )
+            .run(overwrite_output=True)
         )
-        ffmpeg.run(stream, overwrite_output=True)
-        typer.secho(
-            f"✅ Successfully converted to {output_path}", fg=typer.colors.GREEN
-        )
+        typer.secho(f"✅ Finished: {output_path.name}", fg=typer.colors.GREEN)
     except ffmpeg.Error as e:
-        typer.secho(f"❌ FFmpeg Error: {e.stderr.decode()}", fg=typer.colors.RED)
-    except Exception as e:
-        typer.secho(f"❌ Unexpected Error: {e}", fg=typer.colors.RED)
+        typer.secho(f"❌ FFmpeg Error: {e}", fg=typer.colors.RED)
 
 
 @app.command()
@@ -40,6 +40,12 @@ def file(
     output: Optional[Path] = typer.Option(
         None, "--out", "-o", help="Custom output filename"
     ),
+    compress: bool = typer.Option(
+        False, "--compress", "-c", help="Enable high compression (CRF 28)"
+    ),
+    crf: Optional[int] = typer.Option(
+        None, help="Manual CRF value (0-51). Override --compress"
+    ),
 ):
     """Convert a single file to a new format."""
     if not input_file.exists():
@@ -49,37 +55,42 @@ def file(
     # Ensure extension starts with a dot
     ext = to if to.startswith(".") else f".{to}"
 
+    final_crf = 23  # Default
+    if compress:
+        final_crf = 28
+    if crf is not None:
+        final_crf = crf
+
     if not output:
         output = input_file.with_suffix(ext)
 
-    run_ffmpeg_conversion(input_file, output)
+    run_ffmpeg_conversion(input_file, output, final_crf)
 
 
 @app.command()
 def dir(
     folder: Path = typer.Argument(..., help="Directory to scan"),
-    source_ext: str = typer.Option("avi", "--from", "-f", help="Extension to look for"),
-    target_ext: str = typer.Option("mp4", "--to", "-t", help="Extension to convert to"),
+    from_ext: str = typer.Option("avi", "--from", "-f"),
+    to_ext: str = typer.Option("mp4", "--to", "-t"),
+    compress: bool = typer.Option(
+        False, "--compress", "-c", help="Compress all files in batch"
+    ),
 ):
-    """Batch convert all files of a specific type in a directory."""
+    """Batch convert and compress an entire folder."""
     if not folder.is_dir():
         typer.secho(f"Not a directory: {folder}", fg=typer.colors.RED)
         raise typer.Exit()
 
-    # Clean up dots
-    s_ext = f".{source_ext.lstrip('.')}"
-    t_ext = f".{target_ext.lstrip('.')}"
-
-    files = list(folder.glob(f"*{s_ext}"))
+    crf_val = 28 if compress else 23
+    files = list(folder.glob(f"*.{from_ext.lstrip('.')}"))
 
     if not files:
-        typer.echo(f"No files found with extension {s_ext}")
+        typer.echo("No matching files found.")
         return
 
-    typer.echo(f"📂 Found {len(files)} files. Starting batch...")
     for f in files:
-        target = f.with_suffix(t_ext)
-        run_ffmpeg_conversion(f, target)
+        target = f.with_suffix(f".{to_ext.lstrip('.')}")
+        run_ffmpeg_conversion(f, target, crf=crf_val)
 
 
 if __name__ == "__main__":
