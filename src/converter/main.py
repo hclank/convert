@@ -1,6 +1,5 @@
 import ffmpeg
 import typer
-import os
 from pathlib import Path
 from typing import Optional
 
@@ -20,8 +19,8 @@ def run_ffmpeg_conversion(input_path: Path, output_path: Path, crf: int = 23):
                 str(output_path),
                 vcodec="libx264",
                 acodec="aac",
-                crf=crf,  # 0-51: 18 is high qual, 28 is high comp
-                preset="medium",  # 'slower' = better compression, 'faster' = bigger file
+                crf=crf,
+                preset="medium",
                 loglevel="error",
             )
             .run(overwrite_output=True)
@@ -52,10 +51,9 @@ def file(
         typer.secho(f"File {input_file} not found.", fg=typer.colors.RED)
         raise typer.Exit()
 
-    # Ensure extension starts with a dot
     ext = to if to.startswith(".") else f".{to}"
 
-    final_crf = 23  # Default
+    final_crf = 23
     if compress:
         final_crf = 28
     if crf is not None:

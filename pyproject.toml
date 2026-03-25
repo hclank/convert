@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "convertr"
-version = "0.1.3"
+version = "0.1.4"
 description = "A universal media converter CLI using FFmpeg"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "typer[all]",
     "ffmpeg-python",
-    "pydantic>=1.10.2,<2.1.0"  # This forces the version redis-om needs
+    "pydantic>=1.10.2,<2.1.0", # This forces the version redis-om needs
 ]
 
 [project.scripts]
